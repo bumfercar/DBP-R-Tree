@@ -117,6 +117,7 @@ public class RTreeImpl implements RTree {
         List<TraceEvent> trace = new ArrayList<>();
         search(root, result, bounds[0], bounds[1], bounds[2], bounds[3], trace);
         visualizeSearch(bounds, trace, result);
+        search(root, result, bounds[0], bounds[1], bounds[2], bounds[3]);
         return result.iterator();
     }
 
@@ -135,6 +136,7 @@ public class RTreeImpl implements RTree {
             visualizeNearestStep(source, nearestPoints, candidate, i + 1);
         }
         return nearestPoints.iterator();
+        return allPoints.subList(0, limit).iterator();
     }
 
     @Override
@@ -270,6 +272,7 @@ public class RTreeImpl implements RTree {
             return;
         }
         trace.add(new TraceEvent(TraceEventType.VISITED, node));
+    private void search(Node node, List<Point> result, double minX, double minY, double maxX, double maxY) {
         if (node.leaf) {
             for (Point point : node.points) {
                 if (containsPoint(point, minX, minY, maxX, maxY)) {
@@ -280,6 +283,9 @@ public class RTreeImpl implements RTree {
         }
         for (Node child : node.children) {
             search(child, result, minX, minY, maxX, maxY, trace);
+            if (intersects(child, minX, minY, maxX, maxY)) {
+                search(child, result, minX, minY, maxX, maxY);
+            }
         }
     }
 
